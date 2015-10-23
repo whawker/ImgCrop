@@ -6242,6 +6242,7 @@ var _classesCropPubsub2 = _interopRequireDefault(_classesCropPubsub);
 var noop = function noop() {},
     defaultOptions = {
   areaType: 'square',
+  changeOnFly: false,
   minSize: 100,
   resultImageSize: 200,
   resultImageFormat: 'image/png',
@@ -6289,7 +6290,11 @@ var imgCrop = function imgCrop(element) {
   };
 
   // Setup CropHost Event Handlers
-  events.on('load-start', mergedOptions.onLoadStart).on('load-done', mergedOptions.onLoadStart).on('load-error', mergedOptions.onLoadError).on('area-move area-resize', updateResultImage).on('area-move-end area-resize-end image-updated', updateResultImage);
+  events.on('load-start', mergedOptions.onLoadStart).on('load-done', mergedOptions.onLoadStart).on('load-error', mergedOptions.onLoadError).on('area-move area-resize', function () {
+    if (mergedOptions.changeOnFly) {
+      updateResultImage();
+    }
+  }).on('area-move-end area-resize-end image-updated', updateResultImage);
 
   this.destroy = function () {
     cropHost.destroy();

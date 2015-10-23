@@ -6,6 +6,7 @@ import CropPubSub from './classes/crop-pubsub';
 var noop = function () {},
   defaultOptions = {
   areaType: 'square',
+  changeOnFly: false,
   minSize: 100,
   resultImageSize: 200,
   resultImageFormat: 'image/png',
@@ -55,7 +56,11 @@ const imgCrop = function(element, options = {}) {
     .on('load-start', mergedOptions.onLoadStart)
     .on('load-done', mergedOptions.onLoadStart)
     .on('load-error', mergedOptions.onLoadError)
-    .on('area-move area-resize', updateResultImage)
+    .on('area-move area-resize', function () {
+      if (mergedOptions.changeOnFly) {
+        updateResultImage()
+      }
+    })
     .on('area-move-end area-resize-end image-updated', updateResultImage);
 
   this.destroy = function() {
