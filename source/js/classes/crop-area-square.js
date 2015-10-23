@@ -1,7 +1,8 @@
 'use strict';
 
-crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
-  var CropAreaSquare = function() {
+import CropArea from './crop-area';
+
+const CropAreaSquare = function () {
     CropArea.apply(this, arguments);
 
     this._resizeCtrlBaseRadius = 10;
@@ -23,7 +24,7 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
     this._areaIsHover = false;
     this._resizeCtrlIsDragging = -1;
     this._areaIsDragging = false;
-  };
+};
 
   CropAreaSquare.prototype = new CropArea();
 
@@ -167,7 +168,7 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
     }
 
     this._dontDragOutside();
-    angular.element(this._ctx.canvas).css({'cursor': cursor});
+    this._ctx.canvas.style.cursor = cursor;
 
     return res;
   };
@@ -210,6 +211,4 @@ crop.factory('cropAreaSquare', ['cropArea', function(CropArea) {
     this._posDragStartY = 0;
   };
 
-
-  return CropAreaSquare;
-}]);
+export default CropAreaSquare;

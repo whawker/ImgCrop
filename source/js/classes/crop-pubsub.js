@@ -1,7 +1,6 @@
 'use strict';
 
-crop.factory('cropPubSub', [function() {
-  return function() {
+const cropPubSub = function() {
     var events = {};
     // Subscribe
     this.on = function(names, handler) {
@@ -15,10 +14,13 @@ crop.factory('cropPubSub', [function() {
     };
     // Publish
     this.trigger = function(name, args) {
-      angular.forEach(events[name], function(handler) {
-        handler.call(null, args);
-      });
+      if (events[name]) {
+        events[name].forEach(function (handler) {
+          handler.call(null, args);
+        });
+      }
       return this;
     };
-  };
-}]);
+}
+
+export default cropPubSub;

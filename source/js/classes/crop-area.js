@@ -1,19 +1,20 @@
 'use strict';
 
-crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
-  var CropArea = function(ctx, events) {
-    this._ctx=ctx;
-    this._events=events;
+import CropCanvas from './crop-canvas';
 
-    this._minSize=80;
+const CropArea = function (ctx, events) {
+    this._ctx = ctx;
+    this._events = events;
 
-    this._cropCanvas=new CropCanvas(ctx);
+    this._minSize = 80;
 
-    this._image=new Image();
+    this._cropCanvas = new CropCanvas(ctx);
+
+    this._image = new Image();
     this._x = 0;
     this._y = 0;
     this._size = 200;
-  };
+};
 
   /* GETTERS/SETTERS */
 
@@ -73,7 +74,7 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
   CropArea.prototype.draw=function() {
     // draw crop area
-    this._cropCanvas.drawCropArea(this._image,[this._x,this._y],this._size,this._drawArea);
+    this._cropCanvas.drawCropArea(this._image,[this._x,this._y],this._size,this._drawArea.bind(this));
   };
 
   CropArea.prototype.processMouseMove=function() {};
@@ -82,5 +83,4 @@ crop.factory('cropArea', ['cropCanvas', function(CropCanvas) {
 
   CropArea.prototype.processMouseUp=function() {};
 
-  return CropArea;
-}]);
+export default CropArea;

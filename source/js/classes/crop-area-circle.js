@@ -1,7 +1,8 @@
 'use strict';
 
-crop.factory('cropAreaCircle', ['cropArea', function(CropArea) {
-  var CropAreaCircle = function() {
+import CropArea from './crop-area';
+
+const CropAreaCircle = function() {
     CropArea.apply(this, arguments);
 
     this._boxResizeBaseSize = 20;
@@ -104,7 +105,7 @@ crop.factory('cropAreaCircle', ['cropArea', function(CropArea) {
     }
 
     this._dontDragOutside();
-    angular.element(this._ctx.canvas).css({'cursor': cursor});
+    this._ctx.canvas.style.cursor = cursor;
 
     return res;
   };
@@ -146,7 +147,5 @@ crop.factory('cropAreaCircle', ['cropArea', function(CropArea) {
     this._posDragStartY = 0;
   };
 
-
-  return CropAreaCircle;
-}]);
+export default CropAreaCircle;
 

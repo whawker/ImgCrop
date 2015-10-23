@@ -1,6 +1,9 @@
 'use strict';
 
-crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'cropEXIF', function($document, CropAreaCircle, CropAreaSquare, cropEXIF) {
+import CropAreaCircle from './crop-area-circle';
+import CropAreaSquare from './crop-area-square';
+import cropEXIF from './crop-exif';
+
   /* STATIC FUNCTIONS */
 
   // Get Element's Offset
@@ -22,7 +25,7 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
       return { top: Math.round(top), left: Math.round(left) };
   };
 
-  return function(elCanvas, opts, events){
+  const CropHost = function (elCanvas, opts, events) {
     /* PRIVATE VARIABLES */
 
     // Object Pointers
@@ -57,7 +60,7 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
         ctx.save();
 
         // and make it darker
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
         ctx.restore();
@@ -89,13 +92,18 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
           canvasDims[1]=minCanvasDims[1];
           canvasDims[0]=canvasDims[1]*imageRatio;
         }
-        elCanvas.prop('width',canvasDims[0]).prop('height',canvasDims[1]).css({'margin-left': -canvasDims[0]/2+'px', 'margin-top': -canvasDims[1]/2+'px'});
+        elCanvas.setAttribute('width', canvasDims[0]);
+        elCanvas.setAttribute('height', canvasDims[1]);
+        //elCanvas.style.marginLeft = ((canvasDims[0] / 2) * -1) + 'px';
+        //elCanvas.style.marginTop = ((canvasDims[1] / 2) * -1) + 'px';
 
         theArea.setX(ctx.canvas.width/2);
         theArea.setY(ctx.canvas.height/2);
         theArea.setSize(Math.min(200, ctx.canvas.width/2, ctx.canvas.height/2));
       } else {
-        elCanvas.prop('width',0).prop('height',0).css({'margin-top': 0});
+        elCanvas.setAttribute('width', 0);
+        elCanvas.setAttribute('height', 0);
+        //elCanvas.style.marginTop = 0;
       }
 
       drawScene();
@@ -106,7 +114,7 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
      * If event is a jQuery event, return changedTouches of event.originalEvent
      */
     var getChangedTouches=function(event){
-      if(angular.isDefined(event.changedTouches)){
+      if(event.changedTouches){
         return event.changedTouches;
       }else{
         return event.originalEvent.changedTouches;
@@ -166,7 +174,7 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
 
     this.getResultImageDataURI=function() {
       var temp_ctx, temp_canvas;
-      temp_canvas = angular.element('<canvas></canvas>')[0];
+      temp_canvas = document.createElement('canvas');
       temp_ctx = temp_canvas.getContext('2d');
       temp_canvas.width = resImgSize;
       temp_canvas.height = resImgSize;
@@ -265,7 +273,10 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
           canvasDims[1]=minCanvasDims[1];
           canvasDims[0]=canvasDims[1]*imageRatio;
         }
-        elCanvas.prop('width',canvasDims[0]).prop('height',canvasDims[1]).css({'margin-left': -canvasDims[0]/2+'px', 'margin-top': -canvasDims[1]/2+'px'});
+        elCanvas.setAttribute('width', canvasDims[0]);
+        elCanvas.setAttribute('height', canvasDims[1]);
+        //elCanvas.style.marginLeft = ((canvasDims[0] / 2) * -1) + 'px';
+        //elCanvas.style.marginTop = ((canvasDims[1] / 2) * -1) + 'px';
 
         var ratioNewCurWidth=ctx.canvas.width/curWidth,
             ratioNewCurHeight=ctx.canvas.height/curHeight,
@@ -275,7 +286,9 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
         theArea.setY(theArea.getY()*ratioNewCurHeight);
         theArea.setSize(theArea.getSize()*ratioMin);
       } else {
-        elCanvas.prop('width',0).prop('height',0).css({'margin-top': 0});
+        elCanvas.setAttribute('width', 0);
+        elCanvas.setAttribute('height', 0);
+        //elCanvas.style.marginTop =  0;
       }
 
       drawScene();
@@ -335,33 +348,33 @@ crop.factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'crop
     /* Life Cycle begins */
 
     // Init Context var
-    ctx = elCanvas[0].getContext('2d');
+    ctx = elCanvas.getContext('2d');
 
     // Init CropArea
     theArea = new CropAreaCircle(ctx, events);
 
     // Init Mouse Event Listeners
-    $document.on('mousemove',onMouseMove);
-    elCanvas.on('mousedown',onMouseDown);
-    $document.on('mouseup',onMouseUp);
+    document.addEventListener('mousemove', onMouseMove);
+    elCanvas.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mouseup', onMouseUp);
 
     // Init Touch Event Listeners
-    $document.on('touchmove',onMouseMove);
-    elCanvas.on('touchstart',onMouseDown);
-    $document.on('touchend',onMouseUp);
+    document.addEventListener('touchmove', onMouseMove);
+    elCanvas.addEventListener('touchstart', onMouseDown);
+    document.addEventListener('touchend', onMouseUp);
 
     // CropHost Destructor
     this.destroy=function() {
-      $document.off('mousemove',onMouseMove);
-      elCanvas.off('mousedown',onMouseDown);
-      $document.off('mouseup',onMouseMove);
+      document.removeEventListener('mousemove', onMouseMove);
+      elCanvas.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('mouseup', onMouseUp);
 
-      $document.off('touchmove',onMouseMove);
-      elCanvas.off('touchstart',onMouseDown);
-      $document.off('touchend',onMouseMove);
+      document.removeEventListener('touchmove', onMouseMove);
+      elCanvas.removeEventListener('touchstart', onMouseDown);
+      document.removeEventListener('touchend', onMouseUp);
 
       elCanvas.remove();
     };
   };
 
-}]);
+export default CropHost;

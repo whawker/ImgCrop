@@ -1,9 +1,8 @@
-'use strict';
+//'use strict';
 var argv         = require('minimist')(process.argv.slice(2)),
     gulp         = require('gulp'),
     header       = require('gulp-header'),
     gutil        = require('gulp-util'),
-    ngAnnotate   = require('gulp-ng-annotate'),
     compass      = require('gulp-compass'),
     refresh      = require('gulp-livereload'),
     prefix       = require('gulp-autoprefixer'),
@@ -17,6 +16,10 @@ var argv         = require('minimist')(process.argv.slice(2)),
     opn          = require('opn'),
     jshint       = require('gulp-jshint'),
     jshintStylish= require('jshint-stylish'),
+    browserify   = require('browserify'),
+    babelify     = require('babelify'),
+    buffer       = require('vinyl-buffer'),
+    source       = require('vinyl-source-stream'),
     pkg          = require('./package.json'),
     lr,
     refresh_lr;
@@ -28,7 +31,7 @@ var today = new Date();
 var Config = {
   port: 9000,
   livereloadPort: 35728,
-  testPage: 'test/ng-img-crop.html',
+  testPage: 'test/index.html',
   cache: (typeof argv.cache !== 'undefined' ? !!argv.cache : true),
   paths: {
     source:   {
@@ -78,25 +81,14 @@ gulp.task('styles', function(){
 
 // Compile Scripts
 gulp.task('scripts', function(){
-  return gulp.src([
-      Config.paths.source.js + '/init.js',
-      Config.paths.source.js + '/classes/*.js',
-      Config.paths.source.js + '/ng-img-crop.js'
-    ])
-    .pipe(concat(pkg.name+'.js', {
-      separator: '\n\n',
-      process: function(src) {
-        // Remove all 'use strict'; from the code and
-        // replaces all double blank lines with one
-        return src.replace(/\r\n/g, '\n')
-                  .replace(/'use strict';\n+/g, '')
-                  .replace(/\n\n\s*\n/g, '\n\n');
-      }
-    }))
-    .pipe(concat.header(Config.banners.unminified + '\n' +
-                        '(function() {\n\'use strict\';\n\n'))
-    .pipe(concat.footer('\n}());'))
-    .pipe(gulp.dest(Config.paths.compileUnminified.js));
+    browserify(Config.paths.source.js + '/init.js')
+      .add(require.resolve('babel/polyfill'))
+      .transform(babelify)
+      .bundle()
+      .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+      .pipe(source('ng-img-crop.js'))
+      .pipe(buffer())
+      .pipe(gulp.dest(Config.paths.compileUnminified.js));
 });
 
 
@@ -110,11 +102,15 @@ gulp.task('dist:css:clean', function(){
     .pipe(clean());
 });
 gulp.task('dist:js', ['dist:js:clean', 'scripts'], function(){
-  return gulp.src(Config.paths.compileUnminified.js + '/**/*.js')
-    .pipe(ngAnnotate())
-    .pipe(uglify())
-    .pipe(header(Config.banners.minified))
-    .pipe(gulp.dest(Config.paths.compileMinified.js));
+    browserify(Config.paths.source.js + '/init.js')
+      .add(require.resolve('babel/polyfill'))
+      .transform(babelify)
+      .bundle()
+      .on('error', gutil.log.bind(gutil, 'Browserify Error'))
+      .pipe(source('ng-img-crop.js'))
+      .pipe(buffer())
+      .pipe(uglify({ mangle: false }))
+      .pipe(gulp.dest(Config.paths.compileMinified.js));
 });
 gulp.task('dist:css', ['dist:css:clean', 'styles'], function(){
   return gulp.src(Config.paths.compileUnminified.css + '/**/*.css')

@@ -1,6 +1,5 @@
 'use strict';
 
-crop.factory('cropCanvas', [function() {
   // Shape = Array of [x,y]; [0, 0] - center
   var shapeArrowNW=[[-0.5,-2],[-3,-4.5],[-0.5,-7],[-7,-7],[-7,-0.5],[-4.5,-3],[-2,-0.5]];
   var shapeArrowNE=[[0.5,-2],[3,-4.5],[0.5,-7],[7,-7],[7,-0.5],[4.5,-3],[2,-0.5]];
@@ -10,19 +9,20 @@ crop.factory('cropCanvas', [function() {
   var shapeArrowW=[[-2.5,-1.5],[-6,-1.5],[-6,-5],[-11,0],[-6,5],[-6,1.5],[-2.5,1.5]];
   var shapeArrowS=[[-1.5,2.5],[-1.5,6],[-5,6],[0,11],[5,6],[1.5,6],[1.5,2.5]];
   var shapeArrowE=[[2.5,-1.5],[6,-1.5],[6,-5],[11,0],[6,5],[6,1.5],[2.5,1.5]];
+  var square=[[-0.75,-0.75],[-0.75,0.75],[0.75,0.75],[0.75,-0.75]];
 
   // Colors
   var colors={
-    areaOutline: '#fff',
+    areaOutline: '#df994c',
     resizeBoxStroke: '#fff',
     resizeBoxFill: '#444',
     resizeBoxArrowFill: '#fff',
-    resizeCircleStroke: '#fff',
-    resizeCircleFill: '#444',
+    resizeCircleStroke: '#df994c',
+    resizeCircleFill: '#df994c',
     moveIconFill: '#fff'
   };
 
-  return function(ctx){
+const cropCanvas = function (ctx) {
 
     /* Base functions */
 
@@ -64,23 +64,24 @@ crop.factory('cropCanvas', [function() {
 
     this.drawIconResizeCircle=function(centerCoords, circleRadius, scale) {
       var scaledCircleRadius=circleRadius*scale;
-      ctx.save();
-      ctx.strokeStyle = colors.resizeCircleStroke;
-      ctx.lineWidth = 2;
-      ctx.fillStyle = colors.resizeCircleFill;
-      ctx.beginPath();
-      ctx.arc(centerCoords[0],centerCoords[1],scaledCircleRadius,0,2*Math.PI);
-      ctx.fill();
-      ctx.stroke();
-      ctx.closePath();
-      ctx.restore();
+      //ctx.save();
+      //ctx.strokeStyle = colors.resizeCircleStroke;
+      //ctx.lineWidth = 1;
+      //ctx.fillStyle = colors.resizeCircleFill;
+      //ctx.beginPath();
+      //ctx.arc(centerCoords[0],centerCoords[1],scaledCircleRadius,0,2*Math.PI);
+      //ctx.fill();
+      //ctx.stroke();
+      //ctx.closePath();
+      //ctx.restore();
+      drawFilledPolygon(square, colors.resizeCircleFill, centerCoords, scaledCircleRadius);
     };
 
     this.drawIconResizeBoxBase=function(centerCoords, boxSize, scale) {
       var scaledBoxSize=boxSize*scale;
       ctx.save();
       ctx.strokeStyle = colors.resizeBoxStroke;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1;
       ctx.fillStyle = colors.resizeBoxFill;
       ctx.fillRect(centerCoords[0] - scaledBoxSize/2, centerCoords[1] - scaledBoxSize/2, scaledBoxSize, scaledBoxSize);
       ctx.strokeRect(centerCoords[0] - scaledBoxSize/2, centerCoords[1] - scaledBoxSize/2, scaledBoxSize, scaledBoxSize);
@@ -107,7 +108,7 @@ crop.factory('cropCanvas', [function() {
 
       ctx.save();
       ctx.strokeStyle = colors.areaOutline;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1;
       ctx.beginPath();
       fnDrawClipPath(ctx, centerCoords, size);
       ctx.stroke();
@@ -126,5 +127,6 @@ crop.factory('cropCanvas', [function() {
       ctx.restore();
     };
 
-  };
-}]);
+};
+
+export default cropCanvas;

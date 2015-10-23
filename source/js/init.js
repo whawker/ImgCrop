@@ -1,3 +1,2 @@
-'use strict';
-
-var crop = angular.module('ngImgCrop', []);
+import imgCrop from './ng-img-crop';
+window.ImgCrop = imgCrop;

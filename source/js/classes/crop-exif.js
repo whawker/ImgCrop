@@ -4,7 +4,7 @@
 
 'use strict';
 
-crop.service('cropEXIF', [function() {
+const cropEXIF = function () {
   var debug = false;
 
   var ExifTags = this.Tags = {
@@ -783,4 +783,6 @@ crop.service('cropEXIF', [function() {
   this.readFromBinaryFile = function(file) {
       return findEXIFinJPEG(file);
   }
-}]);
+};
+
+export default new cropEXIF();
